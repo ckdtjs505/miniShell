@@ -57,7 +57,7 @@ main() {
         if (check == 0)
           pid = waitpid(pid, & status, 0);
       } else {
-
+        
         for (i = 0; i < argi2; i++) {
           if (!strcmp(arg[i], "<")) {
             fd = open(arg[i + 1], O_RDONLY);
@@ -65,13 +65,6 @@ main() {
             close(fd);
             arg[i] = (char * ) 0;
             arg[i + 1] = (char * ) 0;
-
-            if((pid2 = fork()) == -1){
-              perror("fork error");
-            }else if (pid == 0 ){
-              execvp(arg[0], arg);
-            }
-            
             break;
           }
           if (!strcmp(arg[i], ">")) {
@@ -92,3 +85,4 @@ main() {
   }
   exit(0);
 }
+
