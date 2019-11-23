@@ -57,11 +57,11 @@ main() {
         if (check == 0)
           pid = waitpid(pid, & status, 0);
       } else {
-        
+
         for (i = 0; i < argi2; i++) {
           if (!strcmp(arg[i], "<")) {
             fd = open(arg[i + 1], O_RDONLY);
-            dup2(fd, 0);
+            dup2(fd, STDIN_FILENO);
             close(fd);
             arg[i] = (char * ) 0;
             arg[i + 1] = (char * ) 0;
@@ -73,8 +73,35 @@ main() {
             close(fd);
             arg[i] = (char * ) 0;
             arg[i + 1] = (char * ) 0;
-            execvp(arg[0], arg);
             break;
+          }
+          if (!strcmp(arg[i], "|")) {
+          	char *acc = arg[i+1];
+            int pfd[2]; 
+            if (pipe(pfd) == -1) {
+              printf("error");
+            }
+            switch (fork()) {
+	            case 0:
+	              close(1);
+	              dup(pfd[1]);
+	              close(pfd[0]);
+	              close(pfd[1]);
+	              arg[i] = (char * ) 0;
+	              arg[i + 1] = (char * ) 0;
+	              execvp(arg[0], arg);
+            }
+            switch (fork()) {
+	            case 0:
+	              close(0);
+	              dup(pfd[0]);
+	              close(pfd[0]);
+	              close(pfd[1]);
+	              execlp(acc, acc, NULL);
+            }
+            if (close(pfd[0]) == -1 || close(pfd[1]) == -1) perror("close5");
+            while(wait(NULL) != -1);
+			return 0;
           }
         }
         execvp(arg[0], arg);
@@ -85,4 +112,3 @@ main() {
   }
   exit(0);
 }
-
