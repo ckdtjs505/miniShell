@@ -16,7 +16,7 @@ main() {
   const char delim2[] = " \t\n";
   static
   const char delim[] = ";";
-  int pid, pid2, status, i, fd;
+  int pid, pid2, status, i, fd, fd2;
 
   while (1) {
     printf("myshell$ ");
@@ -57,11 +57,33 @@ main() {
         if (check == 0)
           pid = waitpid(pid, & status, 0);
       } else {
-
         for (i = 0; i < argi2; i++) {
           if (!strcmp(arg[i], "<")) {
+            for(j = i+1; j < argi2; j++){
+          		if(!strcmp(arg[j],">")){
+          			char *acc1 = arg[i+1];
+          			char *acc2 = arg[j+1];
+          			
+          			fd = open(acc1, O_RDONLY);
+		            dup2(fd, 0); // 파일의 입력을  
+		            close(fd);
+		            
+		            fd2 = open(acc2, O_CREAT | O_RDWR | O_TRUNC, 0600);
+		            dup2(fd2,1);
+		            close(fd2);
+		            
+					arg[i] = acc1; 
+      				arg[i+1] = (char * ) 0;
+      				arg[j] = (char * ) 0;
+      				arg[j+1] = (char * ) 0;
+		            execvp(arg[0], arg);
+				}
+		    }
+		  }
+        
+          if (!strcmp(arg[i], "<")) {
             fd = open(arg[i + 1], O_RDONLY);
-            dup2(fd, STDIN_FILENO);
+            dup2(fd, 0); 
             close(fd);
             arg[i] = (char * ) 0;
             arg[i + 1] = (char * ) 0;
@@ -69,7 +91,7 @@ main() {
           }
           if (!strcmp(arg[i], ">")) {
             fd = open(arg[i + 1], O_CREAT | O_RDWR | O_TRUNC, 0600);
-            dup2(fd, 1);
+            dup2(fd, 1); 
             close(fd);
             arg[i] = (char * ) 0;
             arg[i + 1] = (char * ) 0;
