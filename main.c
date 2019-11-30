@@ -18,6 +18,21 @@ void make_commend(char **commend, char *buf){
     commend[argi] = (char * ) 0;
 };
 
+void make_token(char **commend , char **arg, int *argi2, int *commend_num){
+  char * s;
+  char * save;
+  static const char delim2[] = " \t\n";  
+  *argi2 = 0;
+  s = strtok_r(commend[*commend_num], delim2, &save); 
+  *commend_num += 1;
+  while (s) {
+    arg[*argi2] = s;
+    *argi2 += 1;
+    s = strtok_r(NULL, delim2, & save);
+  }
+  arg[*argi2] = (char * ) 0;
+}
+
 int exec_command(char **arg,int argi2){
   int i, j, pid, status, fd, fd2;
   int check = 0;
@@ -113,28 +128,14 @@ int exec_command(char **arg,int argi2){
     printf("%d \n", pid);
 };
 
-void make_token(char **commend , char **arg,int argi2, int& j){
-  char * s;
-  char * save;
-  static const char delim2[] = " \t\n";  
-  argi2 = 0;
-  s = strtok_r(commend[j++], delim2, &save);
-  while (s) {
-    arg[argi2++] = s;
-    s = strtok_r(NULL, delim2, & save);
-  }
-  arg[argi2] = (char * ) 0;
-}
+
 
 main() {
   char buf[256];
   char * arg[MAXARG];
   char * commend[MAXARG];
-  
-
   int argi, argi2;
-  
-  int pid, pid2, status, i, fd, fd2;
+  int pid, pid2, status, commend_num, i, fd, fd2;
 
   while (1) {
     // display prompt msg
@@ -146,9 +147,10 @@ main() {
     // make commend; 
     make_commend(commend, buf);
 
-    int j = 0;
-    while (commend[j]) {
-      make_token(commend, arg, argi2, j);
+    // exec commend;
+    commend_num = 0;
+    while (commend[commend_num]) {
+      make_token(commend, arg, & argi2, & commend_num);
       exec_command(arg, argi2);
     }
   }
