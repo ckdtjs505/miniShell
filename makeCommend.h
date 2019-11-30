@@ -1,0 +1,1 @@
+void make_commend(char **commend, char *buf);

@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "types.h": "c",
+        "unistd.h": "c",
+        "makecommend.h": "c",
+        "stdio.h": "c",
+        "string.h": "c",
+        "maketoken.h": "c",
+        "execcommend.h": "c"
+    }
+}
